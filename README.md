@@ -1,5 +1,4 @@
 # RocksDict / SpeeDict
-
 **Key-value storage for Python & Wrapper of Rocksdb and Speedb**
 
 ![CI](https://github.com/Congyuwang/RocksDict/actions/workflows/CI.yml/badge.svg)

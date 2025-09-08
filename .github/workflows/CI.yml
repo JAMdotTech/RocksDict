@@ -1,6 +1,8 @@
 name: CI
 
 on:
+  push:
+    branches: [ "main" ]
   release:
     types: [published]
 
@@ -64,7 +66,7 @@ jobs:
       fail-fast: false
       matrix:
         py_version:
-          [3.8, 3.9, "3.10", "3.11", "3.12", "3.13", "pypy3.9", "pypy3.10"]
+          [3.8, 3.9, "3.10", "3.11", "3.12", "3.13", "3.14", "pypy3.9", "pypy3.10"]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -119,7 +121,7 @@ jobs:
       matrix:
         target: [x64]
         py_version:
-          [3.7, 3.8, 3.9, "3.10", "3.11", "3.12", "3.13", "pypy3.9", "pypy3.10"]
+          [3.7, 3.8, 3.9, "3.10", "3.11", "3.12", "3.13", "3.14", "pypy3.9", "pypy3.10"]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -183,7 +185,7 @@ jobs:
           rustup-components: rustfmt
           target: ${{ matrix.target }}
           manylinux: 2_28
-          args: --release --out dist --interpreter '3.7 3.8 3.9 3.10 3.11 3.12 3.13 pypy3.9 pypy3.10'
+          args: --release --out dist --interpreter '3.7 3.8 3.9 3.10 3.11 3.12 3.13 3.14 pypy3.9 pypy3.10'
           container: congyuwang/manylinux_2_28_x86_64:llvm-20.1.5
         env:
           LIBCLANG_PATH: /usr/local/lib
@@ -226,7 +228,7 @@ jobs:
           rustup-components: rustfmt
           target: ${{ matrix.target }}
           manylinux: 2014
-          args: --release --out dist --interpreter '3.7 3.8 3.9 3.10 3.11 3.12 3.13 pypy3.9 pypy3.10'
+          args: --release --out dist --interpreter '3.7 3.8 3.9 3.10 3.11 3.12 3.13 3.14 pypy3.9 pypy3.10'
           container: congyuwang/manylinux2014_x86_64:llvm-20.1.5
         env:
           LIBCLANG_PATH: /usr/local/lib
@@ -268,7 +270,7 @@ jobs:
           rustup-components: rustfmt
           target: ${{ matrix.target }}
           manylinux: 2_28
-          args: --release --out dist --interpreter '3.7 3.8 3.9 3.10 3.11 3.12 3.13 pypy3.9 pypy3.10'
+          args: --release --out dist --interpreter '3.7 3.8 3.9 3.10 3.11 3.12 3.13 3.14 pypy3.9 pypy3.10'
           container: congyuwang/manylinux_2_28_aarch64:llvm-20.1.5
         env:
           LIBCLANG_PATH: /usr/local/lib
@@ -310,7 +312,7 @@ jobs:
           rustup-components: rustfmt
           target: ${{ matrix.target }}
           manylinux: 2014
-          args: --release --out dist --interpreter '3.7 3.8 3.9 3.10 3.11 3.12 3.13 pypy3.9 pypy3.10'
+          args: --release --out dist --interpreter '3.7 3.8 3.9 3.10 3.11 3.12 3.13 3.14 pypy3.9 pypy3.10'
           container: congyuwang/manylinux2014_aarch64:llvm-20.1.5
         env:
           LIBCLANG_PATH: /usr/local/lib
@@ -348,7 +350,7 @@ jobs:
           rustup-components: rustfmt
           target: ${{ matrix.target }}
           manylinux: musllinux_1_2
-          args: --release --no-default-features --features bindgen-static,lto --out dist --interpreter '3.7 3.8 3.9 3.10 3.11 3.12 3.13 pypy3.9 pypy3.10'
+          args: --release --no-default-features --features bindgen-static,lto --out dist --interpreter '3.7 3.8 3.9 3.10 3.11 3.12 3.13 3.14 pypy3.9 pypy3.10'
           container: congyuwang/musllinux_1_2_x86_64:llvm-20.1.5
           before-script-linux: |
             apk update
@@ -396,7 +398,7 @@ jobs:
           rustup-components: rustfmt
           target: ${{ matrix.target }}
           manylinux: musllinux_1_2
-          args: --release --no-default-features --features bindgen-static,lto --out dist --interpreter '3.7 3.8 3.9 3.10 3.11 3.12 3.13 pypy3.9 pypy3.10'
+          args: --release --no-default-features --features bindgen-static,lto --out dist --interpreter '3.7 3.8 3.9 3.10 3.11 3.12 3.13 3.14 pypy3.9 pypy3.10'
           container: congyuwang/musllinux_1_2_aarch64:llvm-20.1.5
           before-script-linux: |
             apk update
@@ -427,42 +429,42 @@ jobs:
           name: wheels-musllinux_1_2-arm64
           path: dist
 
-  release:
-    name: Release
-    runs-on: ubuntu-latest
-    needs:
-      [
-        windows,
-        macos,
-        manylinux_2_28_x86_64,
-        manylinux2014_x86_64,
-        manylinux_2_28_arm64,
-        manylinux2014_arm64,
-        musllinux_1_2_x86_64,
-        musllinux_1_2_arm64,
-      ]
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          path: dist
-          pattern: wheels-*
-          merge-multiple: true
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.9
-      - name: Publish to PyPi
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-        run: |
-          pip install --upgrade twine
-          twine upload --skip-existing dist/*
-      - name: Github Release
-        uses: softprops/action-gh-release@v2
-        if: github.ref_type == 'tag'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          files: dist/*
+#  release:
+#    name: Release
+#    runs-on: ubuntu-latest
+#    needs:
+#      [
+#        windows,
+#        macos,
+#        manylinux_2_28_x86_64,
+#        manylinux2014_x86_64,
+#        manylinux_2_28_arm64,
+#        manylinux2014_arm64,
+#        musllinux_1_2_x86_64,
+#        musllinux_1_2_arm64,
+#      ]
+#    permissions:
+#      contents: write
+#    steps:
+#      - uses: actions/download-artifact@v4
+#        with:
+#          path: dist
+#          pattern: wheels-*
+#          merge-multiple: true
+#      - uses: actions/setup-python@v5
+#        with:
+#          python-version: 3.9
+#      - name: Publish to PyPi
+#        env:
+#          TWINE_USERNAME: __token__
+#          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+#        run: |
+#          pip install --upgrade twine
+#          twine upload --skip-existing dist/*
+#      - name: Github Release
+#        uses: softprops/action-gh-release@v2
+#        if: github.ref_type == 'tag'
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          files: dist/*
