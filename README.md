@@ -4,7 +4,7 @@
 ![CI](https://github.com/Congyuwang/RocksDict/actions/workflows/CI.yml/badge.svg)
 ![PyPI](https://img.shields.io/pypi/dm/rocksdict)
 ![PyPI](https://img.shields.io/pypi/wheel/rocksdict)
-[![Support python versions](https://img.shields.io/pypi/pyversions/rocksdict.svg)](https://pypi.org/project/rocksdict/)
+[![Support python versions](https://img.shields.io/pypi/pyversions/rocksdict.svg)](https://pypi.org/project/jam-rocksdict/)
 
 ## Installation
 
